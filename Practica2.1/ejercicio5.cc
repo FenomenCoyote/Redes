@@ -5,6 +5,8 @@
 #include <string.h>
 #include <iostream>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char* args[]){
 
@@ -39,26 +41,28 @@ int main(int argc, char* args[]){
 
     connect(sd, res->ai_addr, res->ai_addrlen);
 
-    char buff[80];
+    char* buff;
     //Bucle ppal
     while(true){
+        //Get line
+        size_t len = 0;
+        ssize_t size = getline(&buff, &len, stdin);
+        buff[size] = '\0';
 
-        memset((void*)&buff, 0, 80);
+        //Send it
+        send(sd, buff, size, 0);
 
-        std::cin >> buff;
-
-        send(sd, buff, 80, 0);
+        //getline uses malloc internally so I have to free it
+        free(buff);
 
         int bytes = recv(sd, (void*)buff, 79, 0);
 
-        if( bytes <= 0) {
+        if( bytes <= 0 ) {
             std::cerr << "FIN CONEXION\n";
             break;
         }
 
-        buff[bytes] = '\0';
-
-        std::cout << buff << std::endl;
+        std::cout << buff;   
     }
 
     freeaddrinfo(res);
