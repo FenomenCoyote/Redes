@@ -35,8 +35,6 @@ int main(int argc, char* args[]){
         return -1;
     }
 
-    bind(sd, res->ai_addr, res->ai_addrlen);
-
     //Send msg
     sendto(sd, args[3], 80, 0, res->ai_addr, res->ai_addrlen);
 
