@@ -73,6 +73,7 @@ int main(int argc, char* args[]){
         send(cliente_sd, buff, bytes, 0);
     }
 
+    close(cliente_sd);
     close(sd);
 
     return 0;

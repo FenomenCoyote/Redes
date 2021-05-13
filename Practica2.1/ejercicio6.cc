@@ -94,12 +94,12 @@ int main(int argc, char* args[]){
 
     freeaddrinfo(res);
 
-
+    ServerEmployee* employees[MAX_THREAD];
     for(int i = 0; i < MAX_THREAD; ++i){
-        ServerEmployee* se = new ServerEmployee(sd);
+        employees[i] = new ServerEmployee(sd);
+        ServerEmployee* se = employees[i];
         std::thread([&se](){
             se->work();
-            delete se;
         }).detach();
     }
 
@@ -107,6 +107,10 @@ int main(int argc, char* args[]){
     while(quit != 'q') {
         sleep(1);
         std::cin.get(quit);
+    }
+
+    for(int i = 0; i < MAX_THREAD; ++i){
+        delete employees[i];
     }
 
     close(sd);
