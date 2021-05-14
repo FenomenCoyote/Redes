@@ -18,6 +18,7 @@ int main(int argc, char* args[]){
 
     memset((void*)&hints, 0, sizeof(struct addrinfo));
 
+    //IPV_4 and udp conexions
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
 
@@ -28,6 +29,7 @@ int main(int argc, char* args[]){
         return -1;
     }
 
+    //Create a socket
     int sd = socket(res->ai_family, res->ai_socktype, 0);
 
     if( sd == -1 ){

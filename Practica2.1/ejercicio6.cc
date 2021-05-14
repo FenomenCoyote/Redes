@@ -109,6 +109,7 @@ int main(int argc, char* args[]){
         std::cin.get(quit);
     }
 
+    //Have to delete employees here because the threads gets suddenly interrupted (so they dont finish "work" method)
     for(int i = 0; i < MAX_THREAD; ++i){
         delete employees[i];
     }

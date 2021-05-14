@@ -18,6 +18,7 @@ int main(int argc, char* args[]){
 
     memset((void*)&hints, 0, sizeof(struct addrinfo));
 
+    //IPV_4 and udp conexions
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
 
@@ -28,6 +29,7 @@ int main(int argc, char* args[]){
         return -1;
     }
 
+    //Create a socket
     int sd = socket(res->ai_family, res->ai_socktype, 0);
 
     if( sd == -1 ){
@@ -35,6 +37,7 @@ int main(int argc, char* args[]){
         return -1;
     }
 
+    //Bind the socket to the conexions
     bind(sd, res->ai_addr, res->ai_addrlen);
 
     freeaddrinfo(res);
@@ -47,6 +50,7 @@ int main(int argc, char* args[]){
         struct sockaddr cliente;
         socklen_t       clientelen = sizeof(struct sockaddr);
 
+        //Receive a message and keep the client's information
         int bytes = recvfrom(sd, (void*)buff, 79, 0, &cliente, &clientelen);
 
         if( bytes == -1) {
@@ -62,17 +66,20 @@ int main(int argc, char* args[]){
 
         std::cout << bytes << " bytes from " << host << ":" << serv << std::endl;
 
+        //If i receive a 'q', i close the server
         if(buff[0] == 'q'){
             std::cout << "Cerrando . . .\n";
             break;
         }
 
+        //Get time
         time_t t = time(NULL);
         struct tm* t_ = localtime(&t);
 
         char timeBuff[80];
         memset((void*)&timeBuff, 0, 80);
 
+        //Parse time
         if(buff[0] == 't'){
             strftime(timeBuff, 80, "%R", t_);
         } 
@@ -80,9 +87,11 @@ int main(int argc, char* args[]){
             strftime(timeBuff, 80, "%D", t_);
         }   
 
+        //Send information to the client
         sendto(sd, timeBuff, 80, 0, &cliente, clientelen);
     }
 
+    //Close the socket
     close(sd);
 
     return 0;

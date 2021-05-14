@@ -18,6 +18,7 @@ int main(int argc, char* args[]){
 
     memset((void*)&hints, 0, sizeof(struct addrinfo));
 
+    //IPV_4 and tcp conexions
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 

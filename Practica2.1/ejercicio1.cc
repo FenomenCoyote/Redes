@@ -17,6 +17,7 @@ int main(int argc, char* args[]){
 
     memset((void*)&hints, 0, sizeof(struct addrinfo));
 
+    //No hints
     hints.ai_family = AF_UNSPEC;
 
     int rc = getaddrinfo(args[1], NULL, &hints, &res);
@@ -26,6 +27,7 @@ int main(int argc, char* args[]){
         return -1;
     }
 
+    //Iterate the list
     for(addrinfo* i = res; i != NULL; i = i->ai_next) {
         char host[NI_MAXHOST];
         char serv[NI_MAXSERV];
