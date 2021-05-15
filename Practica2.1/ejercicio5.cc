@@ -37,8 +37,6 @@ int main(int argc, char* args[]){
         return -1;
     }
 
-    bind(sd, res->ai_addr, res->ai_addrlen);
-
     connect(sd, res->ai_addr, res->ai_addrlen);
 
     char* buff;
