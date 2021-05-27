@@ -54,8 +54,6 @@ int Socket::recv(Serializable &obj, Socket * &sock)
         sock = new Socket(&sa, sa_len);
     }
 
-    std::cout << sock << std::endl;
-
     obj.from_bin(buffer);
 
     return 0;
@@ -68,6 +66,8 @@ int Socket::send(Serializable& obj, const Socket& sock)
     obj.to_bin();
     
     sendto(sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
+
+    return 0;
 }
 
 bool operator== (const Socket &s1, const Socket &s2)

@@ -41,6 +41,8 @@ public:
 
     ChatMessage(){};
 
+    ~ChatMessage() {}
+
     ChatMessage(const std::string& n, const std::string& m):nick(n),message(m){};
 
     void to_bin();
