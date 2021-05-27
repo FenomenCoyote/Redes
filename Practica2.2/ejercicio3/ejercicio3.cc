@@ -12,16 +12,22 @@
 class Jugador: public Serializable
 {
 public:
+
     Jugador(const char * _n, int16_t _x, int16_t _y):x(_x),y(_y)
     {
         strncpy(name, _n, MAX_NAME);
-        alloc_data(MAX_NAME + 2*sizeof(int16_t));
     };
 
     virtual ~Jugador(){};
 
     void to_bin(){
+
+        alloc_data(JUGADOR_SIZE);
+
+        memset(_data, 0, JUGADOR_SIZE);
+
         char* pointer = _data;
+        
         memcpy(pointer, name, MAX_NAME);
         pointer += MAX_NAME;
 
@@ -32,20 +38,27 @@ public:
     }
 
     int from_bin(char* data) {
-        memcpy(name, data, MAX_NAME);
-        data += MAX_NAME;
 
-        memcpy(&x, data, sizeof(int16_t));
-        data += sizeof(int16_t);
+        alloc_data(JUGADOR_SIZE);
+
+        memcpy(static_cast<void *>(_data), data, JUGADOR_SIZE);
+
+        char* pointer = _data;
+
+        memcpy(name, pointer, MAX_NAME);
+        pointer += MAX_NAME;
+
+        memcpy(&x, pointer, sizeof(int16_t));
+        pointer += sizeof(int16_t);
         
-        memcpy(&y, data, sizeof(int16_t));
+        memcpy(&y, pointer, sizeof(int16_t));
 
         return 0;
     }
 
-
 public:
     static const size_t MAX_NAME = 20;
+    static const size_t JUGADOR_SIZE = MAX_NAME + 2*sizeof(int16_t);
     char name[MAX_NAME];
 
     int16_t x;
@@ -61,14 +74,14 @@ int main(int argc, char **argv)
     one_w.to_bin();
 
     // 2. Escribir la serialización en un fichero
-    int f = creat("file.txt", 00666);
+    int f = creat("playerInfo", 00666);
 
     write(f, one_w.data(), one_w.size());
 
     close(f);
 
     // 3. Leer el fichero
-    f = open("file.txt", O_RDONLY);
+    f = open("playerInfo", O_RDONLY);
 
     char buff[one_w.size()];
     read(f, buff, one_w.size());
