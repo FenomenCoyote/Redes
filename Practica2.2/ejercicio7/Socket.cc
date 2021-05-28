@@ -25,7 +25,7 @@ Socket::Socket(const char * address, const char * port):sd(-1)
     sd = socket(res->ai_family, res->ai_socktype, 0); 
 
     if( sd == -1 ){
-        std::cerr << "Error: creacion soccket\n";
+        std::cerr << "Error: creacion soccket\n" << std::flush;
         exit(-1);
     }
 
@@ -65,7 +65,9 @@ int Socket::send(Serializable& obj, const Socket& sock)
     //Enviar el objeto binario a sock usando el socket sd
     obj.to_bin();
     
-    sendto(sd, obj.data(), obj.size(), 0, &sa, sa_len);
+    sendto(sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
+
+    return 0;
 }
 
 bool operator== (const Socket &s1, const Socket &s2)

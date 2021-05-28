@@ -16,29 +16,34 @@ void ChatMessage::to_bin()
     memcpy(pointer, &type, sizeof(uint8_t));
     pointer += sizeof(uint8_t);
 
-    memcpy(pointer, &nick, 8);
+    memcpy(pointer, nick.c_str(), 8);
     pointer += 8;
     
-    memcpy(pointer, &message, 80);
+    memcpy(pointer, message.c_str(), 80);
+
 }
 
 int ChatMessage::from_bin(char * bobj)
 {
     alloc_data(MESSAGE_SIZE);
 
-    memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
-
     //Reconstruir la clase usando el buffer _data
 
-    char* pointer = _data;
+    char* pointer = bobj;
 
     memcpy(&type, pointer, sizeof(uint8_t));
     pointer += sizeof(uint8_t);
 
-    memcpy(&nick, pointer, 8);
+    char _nick_[8];
+
+    memcpy(&_nick_, pointer, 8);
     pointer += 8;
+    nick = _nick_;
     
-    memcpy(&message, pointer,80);
+    char _msg_[80];
+
+    memcpy(&_msg_, pointer,80);
+    message = _msg_;
 
     return 0;
 }
@@ -48,8 +53,11 @@ int ChatMessage::from_bin(char * bobj)
 
 void ChatServer::do_messages()
 {
-    while (true)
-    {
+    clients = std::vector<std::unique_ptr<Socket>>();
+    clients.reserve(5);
+    
+    ChatMessage msg;
+    while (true) {
         /*
          * NOTA: los clientes están definidos con "smart pointers", es necesario
          * crear un unique_ptr con el objeto socket recibido y usar std::move
@@ -61,24 +69,26 @@ void ChatServer::do_messages()
         // - LOGOUT: Eliminar del vector clients
         // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
 
-        ChatMessage msg;
-        Socket *sd;
-
+        Socket *sd = (Socket*)1;
         socket.recv(msg, sd);
 
         switch (msg.type)
         {
-            case ChatMessage::MessageType::LOGIN:
-                clients.push_back(std::unique_ptr<Socket>(sd));
+            case ChatMessage::MessageType::LOGIN:{
+                std::cout << "LOGIN\n" << std::flush;
+                clients.push_back(std::unique_ptr<Socket>(std::move(sd)));
                 break;
+            }
             case ChatMessage::MessageType::MESSAGE:
+                std::cout << "MESSAGE\n" << std::flush;
                 for(auto it = clients.begin(); it != clients.end(); ++it){
-                    if(it->get() == sd)
+                    if(*it->get() == *sd)
                         continue;
                     socket.send(msg, *it->get());
                 }
                 break;
-            case ChatMessage::MessageType::LOGOUT:
+            case ChatMessage::MessageType::LOGOUT: {
+                std::cout << "LOGOUT\n" << std::flush;
                 auto it = clients.begin();
                 while( it != clients.end() ){
                     if( it->get() == sd ){
@@ -88,10 +98,11 @@ void ChatServer::do_messages()
                     ++it;
                 }
                 break;
+            }
             default:
+                std::cout << "UNKOWN MESSAGE\n" << std::flush;
                 break;
         }
-        
     }
 }
 

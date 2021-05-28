@@ -16,29 +16,34 @@ void ChatMessage::to_bin()
     memcpy(pointer, &type, sizeof(uint8_t));
     pointer += sizeof(uint8_t);
 
-    memcpy(pointer, &nick, 8);
+    memcpy(pointer, nick.c_str(), 8);
     pointer += 8;
     
-    memcpy(pointer, &message, 80);
+    memcpy(pointer, message.c_str(), 80);
+
 }
 
 int ChatMessage::from_bin(char * bobj)
 {
     alloc_data(MESSAGE_SIZE);
 
-    memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
-
     //Reconstruir la clase usando el buffer _data
 
-    char* pointer = _data;
+    char* pointer = bobj;
 
     memcpy(&type, pointer, sizeof(uint8_t));
     pointer += sizeof(uint8_t);
 
-    memcpy(&nick, pointer, 8);
+    char _nick_[8];
+
+    memcpy(&_nick_, pointer, 8);
     pointer += 8;
+    nick = _nick_;
     
-    memcpy(&message, pointer,80);
+    char _msg_[80];
+
+    memcpy(&_msg_, pointer,80);
+    message = _msg_;
 
     return 0;
 }

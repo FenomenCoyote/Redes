@@ -100,7 +100,7 @@ void ChatServer::do_messages()
                 break;
             }
             default:
-                std::cout << "UNKOWN\n" << std::flush;
+                std::cout << "UNKOWN MESSAGE\n" << std::flush;
                 break;
         }
     }
@@ -111,9 +111,7 @@ void ChatServer::do_messages()
 
 void ChatClient::login()
 {
-    std::string msg;
-
-    ChatMessage em(nick, msg);
+    ChatMessage em("", "");
     em.type = ChatMessage::MessageType::LOGIN;
 
     socket.send(em, socket);
@@ -121,10 +119,7 @@ void ChatClient::login()
 
 void ChatClient::logout()
 {
-    // Completar
-    std::string msg;
-
-    ChatMessage em(nick, "");
+    ChatMessage em("", "");
     em.type = ChatMessage::MessageType::LOGOUT;
 
     socket.send(em, socket);
